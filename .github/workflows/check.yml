@@ -1,0 +1,23 @@
+name: Чи працює сервіс
+
+on:
+  schedule:
+    # Кожні 10 хвилин. GitHub запускає розклад із затримкою до кількох хвилин.
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Перевірки
+        run: ./check.sh
