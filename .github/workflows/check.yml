@@ -5,6 +5,11 @@ on:
     # Кожні 10 хвилин. GitHub запускає розклад із затримкою до кількох хвилин.
     - cron: "*/10 * * * *"
   workflow_dispatch:
+    inputs:
+      simulate_outage:
+        description: "Перевірити тривогу: вдати, що сервіс лежить"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -20,4 +25,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Перевірки
-        run: ./check.sh
+        env:
+          # Лише для ручної перевірки тривоги: сервіс підмінено неіснуючою адресою.
+          CHECK_API: ${{ inputs.simulate_outage && 'https://down.livedit-status.invalid' || '' }}
+        run: |
+          [ -z "$CHECK_API" ] && unset CHECK_API
+          ./check.sh
